@@ -1,0 +1,71 @@
+Names of all partners: Moe Aung (Solo)
+
+An explanation of how well your TinyFS implementation works:
+- implemented Open-source checksum CRC32 code and validations 
+- has checksum for validations across core structures and decent coverage
+- ZFS style-indexing of Inodes
+- Handles a robust amount of error codes and segfault proofing which can all be handled on the Demo using the libTinyFS interface
+- Bitmap Block based block management
+- complexity from being only able to write to data segment of datablocks (because of attached checksum)
+- anything related to clearing entries, wipes the entire blocks clean (defensive programming) and not just invalidate their pointers
+- attempted atomicity (rollback, all or nothing, error recoveries in mounting) (at least on mounting) 
+
+
+Any limitations or bugs your file system has:
+- Each inode have 2 direct data block pointer and 1 indirect block pointer including 4 byte checksum in each so holds up to 16,896 bytes (16.5 KB) of data. It is fixed though and neither allocates less or more.
+- My FS is limited to one level of hierachy aka root_directory
+- FileTable is lost when disk is unmounted
+
+An explanation of which additional functionality areas you have chosen and how you have shown that it works.
+- Read-only and writeByte support:
+tfs_makeRO(char *name) 
+tfs_makeRW(char *name) 
+tfs_writeByte(fileDescriptor FD, int offset, unsigned char data)
+- Directory listing and renaming
+tfs_rename(...) 
+tfs_readdir(...)
+
+
+Additional blabber:
+
+I am modelling my File System after ZFS
+
+ZFS Superblock
+- has 8 bit type 0x5A
+- block \# of bitmap block (feature)
+- block \# of root directory (asgn req)
+- file system size
+- checksum (at the end)
+- paddings to complete BLOCK_SIZE
+
+BitmapBlock
+- a block was dedicated to keeping track of free blocks using bitmap
+
+ZFS Inodes
+- file size storage
+- two direct pointers to data blocks
+- one pointer to an indirect blocks
+
+ZFS Data blocks
+- has a segment for data
+- has a checksum at the end of block | I use CRC32 (4 bytes)
+
+Indirect Blocks and Directories
+- Datablocks' data segment are accessed as DirectoryEntry* (for Directories) or Block* (for Indirect Blocks)
+- has checksum (at the end)
+
+- unintialized block pointers set to INVALID_BLOCK|UINT32_MAX (because I use uint instead of int and cannot use -1 to invalidate)
+
+Notes:
+Universal:
+- ZFS Checksum in Datablocks, Superblock, Inode blocks
+- ZFS Inodes with 2 direct data block pointers and one indirect block pointer
+
+Universal (None ZFS):
+
+FILE TABLES
+- inactive file entries are kept and when a new file is opened, the file table is iterated through and the first inactive entry it sees is replaced.
+
+potential improvements:
+- error codes could've been grouped by functions but I was working iteratively on the functions so they should indirectly be so
+- multiple hierachy levels | given my code, it shouldn't be neccessarily too hard. I already have Directories anyways. 
