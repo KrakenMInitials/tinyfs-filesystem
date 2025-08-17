@@ -5,6 +5,9 @@ It’s a flat, block-based filesystem that mimics a few POSIX-style operations, 
 
 The goal here isn’t production-readiness but to exercise mechanical sympathy with how filesystems actually tick: superblocks, inodes, data blocks, free block management, etc.
 
+[Watch Demo Video (Google Drive)](https://drive.google.com/file/d/1rVkdr50zKSI2eMQdF26UdKRi6SBIcHcW/view?usp=sharing)
+
+
 ---
 
 ## ✨ Features
