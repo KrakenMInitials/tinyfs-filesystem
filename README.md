@@ -3,6 +3,10 @@
 TinyFS is a toy filesystem implementation built for my CSC 453 assignment.  
 It’s a flat, block-based filesystem that mimics a few POSIX-style operations, with some realistic extensions inspired by ZFS principles.
 
+I took the opportunity to implement what I learned about ZFS in setting up my own homelab running TrueNAS (at the time) during a class project to develop a filesystem. It includes features and considerations sourced from the ZFSHandbook.com and trimed down features that fit the scope of the class project. The mock implementation consists of block checksums, hybrid data block indexing in inodes, comprehensive error codes, and reasonable fault-tolerance. Github readme includes an unpolished demo indicating fault tolerance and checksuming. To date, this is one the projects that went unbelievable well and smoothly due to the, unknowingly, test-driven development on each layer of the file system and functions taken. I wrote sample test codes to make sure the intended results of each function or sequence of functions were achieved and worked on functions thoroughly one at a time, abstracting away the complexities completed ones entirely and trusting they were not the issue if an error comes up. 
+One of the main challenges was in distinguishing directories and files in the 'datablock's while leaving the last 16 bytes for the checksum value and making sure actual data values (file entries for directories and content for files) were isolated from the checksum. I found a workaround by having a constant MAX_DIRECTORY_SIZE  and MAX_DIRECTORY_SIZE which took into account the 16 bytes and were used to compare against content sizes to write on write. Due to the freedom of C, I also simply accessed the data values for directory file types using struct DirectoryEntry pointers.
+
+
 The goal here isn’t production-readiness but to exercise mechanical sympathy with how filesystems actually tick: superblocks, inodes, data blocks, free block management, etc.
 
 [Watch Demo Video (Google Drive)](https://drive.google.com/file/d/1rVkdr50zKSI2eMQdF26UdKRi6SBIcHcW/view?usp=sharing)
